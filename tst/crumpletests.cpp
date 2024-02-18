@@ -22,36 +22,36 @@ TEST_CASE("Tree:SimpleInsertAndFind:ExpectSingleInsertFound",
     REQUIRE(tree.contains(5));
 }
 
-// TEST_CASE("Tree:DoubleInsert:ExpectFindSecondInsert",
-//           "[Required][Basic][Insert][Contains]") {
-//     proj4::CrumpleTree<int, std::string> tree;
-//     tree.insert(5, "foo");
-//     tree.insert(10, "bar");
+TEST_CASE("Tree:DoubleInsert:ExpectFindSecondInsert",
+          "[Required][Basic][Insert][Contains]") {
+    proj4::CrumpleTree<int, std::string> tree;
+    tree.insert(5, "foo");
+    tree.insert(10, "bar");
 
-//     REQUIRE(tree.contains(10));
-// }
+    REQUIRE(tree.contains(10));
+}
 
-// TEST_CASE("Tree:QuadInsert:ExpectFindFindTwoHopsAway",
-//           "[Required][Basic][Insert][Contains]") {
-//     proj4::CrumpleTree<int, std::string> tree;
-//     tree.insert(5, "foo");
-//     tree.insert(3, "sna");
-//     tree.insert(10, "bar");
-//     tree.insert(12, "twelve");
+TEST_CASE("Tree:QuadInsert:ExpectFindFindTwoHopsAway",
+          "[Required][Basic][Insert][Contains]") {
+    proj4::CrumpleTree<int, std::string> tree;
+    tree.insert(5, "foo");
+    tree.insert(3, "sna");
+    tree.insert(10, "bar");
+    tree.insert(12, "twelve");
 
-//     REQUIRE(tree.contains(12));
-// }
+    REQUIRE(tree.contains(12));
+}
 
-// TEST_CASE("Tree:5Inserts:ExpectSize5", "[Required][Basic][Insert][Size]") {
-//     proj4::CrumpleTree<int, std::string> tree;
-//     tree.insert(5, "foo");
-//     tree.insert(3, "sna");
-//     tree.insert(10, "bar");
-//     tree.insert(12, "twelve");
-//     tree.insert(15, "fifteen");
+TEST_CASE("Tree:5Inserts:ExpectSize5", "[Required][Basic][Insert][Size]") {
+    proj4::CrumpleTree<int, std::string> tree;
+    tree.insert(5, "foo");
+    tree.insert(3, "sna");
+    tree.insert(10, "bar");
+    tree.insert(12, "twelve");
+    tree.insert(15, "fifteen");
 
-//     REQUIRE(tree.size() == 5);
-// }
+    REQUIRE(tree.size() == 5);
+}
 
 // TEST_CASE("Tree:DoAPostOrder:ExpectCorrectPostorderTraversal",
 //           "[Required][Basic][Insert][PostOrder]") {
@@ -144,5 +144,63 @@ TEST_CASE("simpleLR",
     REQUIRE(tree.level(40) == 1);
     REQUIRE(tree.size()==3);
 }
+
+TEST_CASE("simpleRR",
+          "[Required][Basic][Insert][Contains]") {
+    proj4::CrumpleTree<int, std::string> tree;
+    tree.insert(20, "40");
+    REQUIRE(tree.getleftedge(20)==1);
+    REQUIRE(tree.getrightedge(20)==1);
+    tree.insert(30, "30");
+    REQUIRE(tree.getrightedge(20)==1);
+    REQUIRE(tree.getleftedge(20)==2);
+    REQUIRE(tree.getleftedge(30)==1);
+    REQUIRE(tree.getrightedge(30)==1);
+    tree.insert(40, "20");
+    REQUIRE(tree.getleftedge(40)==1);
+    REQUIRE(tree.getrightedge(40)==1);
+    REQUIRE(tree.getleftedge(30)==1);
+    REQUIRE(tree.getrightedge(30)==1);
+    REQUIRE(tree.getleftedge(20)==1);
+    REQUIRE(tree.getrightedge(20)==1);
+    REQUIRE(tree.contains(40));
+    REQUIRE(tree.contains(30));
+    REQUIRE(tree.contains(20));
+    REQUIRE(tree.getroot() == 30);
+    REQUIRE(tree.level(30) == 2);
+    REQUIRE(tree.level(20) == 1);
+    REQUIRE(tree.level(40) == 1);
+    REQUIRE(tree.size()==3);
+}
+
+TEST_CASE("simpleRL",
+          "[Required][Basic][Insert][Contains]") {
+    proj4::CrumpleTree<int, std::string> tree;
+    tree.insert(20, "50");
+    REQUIRE(tree.getleftedge(20)==1);
+    REQUIRE(tree.getrightedge(20)==1);
+    tree.insert(30, "40");
+    REQUIRE(tree.getrightedge(20)==1);
+    REQUIRE(tree.getleftedge(20)==2);
+    REQUIRE(tree.getleftedge(30)==1);
+    REQUIRE(tree.getrightedge(30)==1);
+    tree.insert(25, "45");
+    REQUIRE(tree.getroot()==25);
+    REQUIRE(tree.getleftedge(25)==1);
+    REQUIRE(tree.getrightedge(25)==1);
+    REQUIRE(tree.getleftedge(20)==1);
+    REQUIRE(tree.getrightedge(20)==1);
+    REQUIRE(tree.getleftedge(30)==1);
+    REQUIRE(tree.getrightedge(30)==1);
+    REQUIRE(tree.contains(20));
+    REQUIRE(tree.contains(30));
+    REQUIRE(tree.contains(25));
+    REQUIRE(tree.level(25) == 2);
+    REQUIRE(tree.level(20) == 1);
+    REQUIRE(tree.level(30) == 1);
+    REQUIRE(tree.size()==3);
+}
+
+
 
 }  // namespace

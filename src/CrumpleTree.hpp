@@ -56,45 +56,89 @@ class CrumpleTree {
         //rebalanced
         if(node->rightedge>2) //left rising;
         {
-            if(node->leftChildren->rightChildren==nullptr)
+            node->rightedge--;
+            Node * newroot = node->leftChildren;
+            if (node->leftChildren->rightedge==2) { //case3 left rising
+                Node * temp_right = newroot->rightChildren;
+                newroot->rightChildren = node;
+                newroot->node_level--;
+                node->leftChildren = temp_right;
+                node->node_level--;
+                node->rightedge--;
+                newroot->rightedge--;
+                node = newroot;
+            }
+            else
             {
-               node = leftrising(node);
+                if(node->leftChildren->leftedge==1) //case 4 left rising
+                {
+                    Node * temp_right = newroot->rightChildren;
+                    newroot->rightChildren = node;
+                    newroot->leftedge++;
+                    node->leftChildren = temp_right;
+                    node = newroot;
+                }
+                else { //case 5 left rising
+                    newroot=newroot->rightChildren;
+                    Node * nodeleftchilde = node->leftChildren;
+                    nodeleftchilde->node_level--;
+                    nodeleftchilde->rightChildren=newroot->leftChildren;
+                    nodeleftchilde->leftedge--;
+                    nodeleftchilde->rightedge=newroot->leftedge;
+                    node->node_level--;
+                    node->leftChildren=newroot->rightChildren;
+                    node->rightedge--;
+                    node->leftedge=newroot->rightedge;
+                    newroot->leftChildren=nodeleftchilde;
+                    newroot->rightChildren=node;
+                    newroot->leftedge=1;
+                    newroot->rightedge=1;
+                    node=newroot;
+                }
+            }
+        }
+        if(node->leftedge>2) {
+            node->leftedge--;
+            Node * newroot = node->rightChildren;
+            if(node->rightChildren->leftedge==2){ //case 3 right rising
+                Node * temp_left = newroot->leftChildren;
+                newroot->leftChildren = node;
+                newroot->node_level--;
+                node->rightChildren = temp_left;
+                node->node_level--;
+                node->leftedge--;
+                newroot->leftedge--;
+                node = newroot;
             }
             else {
-                node->leftChildren = leftmovedown(node->leftChildren);
-                node = rightmovedown(node);
+                if(node->rightChildren->rightedge==1){ //case 4 right rising
+                    Node * temp_left = newroot->leftChildren;
+                    newroot->leftChildren = node;
+                    newroot->rightedge++;
+                    node->rightChildren = temp_left;
+                    node = newroot;
+                }
+                else { //case 5 right rising.
+                    newroot=newroot->leftChildren;
+                    Node * noderightchild = node->rightChildren;
+                    noderightchild->node_level--;
+                    noderightchild->leftChildren=newroot->rightChildren;
+                    noderightchild->rightedge--;
+                    noderightchild->leftedge=newroot->rightedge;
+                    node->node_level--;
+                    node->rightChildren=newroot->leftChildren;
+                    node->leftedge--;
+                    node->rightedge=newroot->leftedge;
+                    newroot->leftChildren=node;
+                    newroot->rightChildren=noderightchild;
+                    newroot->leftedge=1;
+                    newroot->rightedge=1;
+                    node=newroot;
+                }
             }
         }
         node->node_level++;
         return node;
-    }
-    Node * leftmovedown(Node*root)
-    {
-        Node * newroot = root->rightChildren;
-        Node * temp_left = newroot->leftChildren;
-        //
-        if(newroot->node_level==1)
-        {
-            newroot->node_level++;
-            newroot->leftedge++;
-        }
-        newroot->leftChildren=root;
-        root->rightChildren = temp_left;
-        root->node_level--;
-        root->leftedge-=2;
-        return newroot;
-    }
-    Node * leftrising(Node * root)
-    {
-        Node * newroot = root->leftChildren;
-        Node * temp_right = newroot->rightChildren;
-        newroot->rightChildren = root;
-        newroot->node_level--;
-        root->leftChildren = temp_right;
-        root->node_level--;
-        root->rightedge-=2;
-        newroot->rightedge--;
-        return newroot;
     }
    public:
     CrumpleTree();
