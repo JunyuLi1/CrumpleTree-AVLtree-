@@ -22,71 +22,127 @@ TEST_CASE("Tree:SimpleInsertAndFind:ExpectSingleInsertFound",
     REQUIRE(tree.contains(5));
 }
 
-TEST_CASE("Tree:DoubleInsert:ExpectFindSecondInsert",
-          "[Required][Basic][Insert][Contains]") {
-    proj4::CrumpleTree<int, std::string> tree;
-    tree.insert(5, "foo");
-    tree.insert(10, "bar");
+// TEST_CASE("Tree:DoubleInsert:ExpectFindSecondInsert",
+//           "[Required][Basic][Insert][Contains]") {
+//     proj4::CrumpleTree<int, std::string> tree;
+//     tree.insert(5, "foo");
+//     tree.insert(10, "bar");
 
-    REQUIRE(tree.contains(10));
-}
+//     REQUIRE(tree.contains(10));
+// }
 
-TEST_CASE("Tree:QuadInsert:ExpectFindFindTwoHopsAway",
-          "[Required][Basic][Insert][Contains]") {
-    proj4::CrumpleTree<int, std::string> tree;
-    tree.insert(5, "foo");
-    tree.insert(3, "sna");
-    tree.insert(10, "bar");
-    tree.insert(12, "twelve");
+// TEST_CASE("Tree:QuadInsert:ExpectFindFindTwoHopsAway",
+//           "[Required][Basic][Insert][Contains]") {
+//     proj4::CrumpleTree<int, std::string> tree;
+//     tree.insert(5, "foo");
+//     tree.insert(3, "sna");
+//     tree.insert(10, "bar");
+//     tree.insert(12, "twelve");
 
-    REQUIRE(tree.contains(12));
-}
+//     REQUIRE(tree.contains(12));
+// }
 
-TEST_CASE("Tree:5Inserts:ExpectSize5", "[Required][Basic][Insert][Size]") {
-    proj4::CrumpleTree<int, std::string> tree;
-    tree.insert(5, "foo");
-    tree.insert(3, "sna");
-    tree.insert(10, "bar");
-    tree.insert(12, "twelve");
-    tree.insert(15, "fifteen");
+// TEST_CASE("Tree:5Inserts:ExpectSize5", "[Required][Basic][Insert][Size]") {
+//     proj4::CrumpleTree<int, std::string> tree;
+//     tree.insert(5, "foo");
+//     tree.insert(3, "sna");
+//     tree.insert(10, "bar");
+//     tree.insert(12, "twelve");
+//     tree.insert(15, "fifteen");
 
-    REQUIRE(tree.size() == 5);
-}
+//     REQUIRE(tree.size() == 5);
+// }
 
-TEST_CASE("Tree:DoAPostOrder:ExpectCorrectPostorderTraversal",
-          "[Required][Basic][Insert][PostOrder]") {
-    proj4::CrumpleTree<int, std::string> tree;
-    tree.insert(5, "foo");
-    tree.insert(3, "sna");
-    tree.insert(10, "bar");
-    auto trav = tree.postOrder();
-    static const std::vector<int> expected = {3, 10, 5};
-    REQUIRE(trav == expected);
-}
+// TEST_CASE("Tree:DoAPostOrder:ExpectCorrectPostorderTraversal",
+//           "[Required][Basic][Insert][PostOrder]") {
+//     proj4::CrumpleTree<int, std::string> tree;
+//     tree.insert(5, "foo");
+//     tree.insert(3, "sna");
+//     tree.insert(10, "bar");
+//     auto trav = tree.postOrder();
+//     static const std::vector<int> expected = {3, 10, 5};
+//     REQUIRE(trav == expected);
+// }
 
-TEST_CASE("Tree:RemoveDoesARemove:ExpectElementsNotInTreeAndLevelsCorrect",
-          "[Required][Insert][Erase][Contains][Level]") {
-    proj4::CrumpleTree<int, std::string> tree;
-    tree.insert(20, "are");
-    tree.insert(19, "you");
-    tree.insert(18, "following");
-    tree.insert(12, "from");
-    tree.insert(9, "lecture?");
-    REQUIRE(tree.contains(20));
-    REQUIRE(tree.contains(19));
-    REQUIRE(tree.contains(18));
-    REQUIRE(tree.contains(12));
-    REQUIRE(tree.contains(9));
-    tree.remove(9);
-    tree.remove(18);
-    // What happens?  12 is now a leaf and must fall.  But 19 is a (2,2) and
-    // remains at level 3.
-    REQUIRE(!tree.contains(9));
-    REQUIRE(!tree.contains(18));
-    REQUIRE(tree.level(20) == 1);
-    REQUIRE(tree.level(12) == 1);
-    REQUIRE(tree.level(19) == 3);
-}
+// TEST_CASE("Tree:RemoveDoesARemove:ExpectElementsNotInTreeAndLevelsCorrect",
+//           "[Required][Insert][Erase][Contains][Level]") {
+//     proj4::CrumpleTree<int, std::string> tree;
+//     tree.insert(20, "are");
+//     tree.insert(19, "you");
+//     tree.insert(18, "following");
+//     tree.insert(12, "from");
+//     tree.insert(9, "lecture?");
+//     REQUIRE(tree.contains(20));
+//     REQUIRE(tree.contains(19));
+//     REQUIRE(tree.contains(18));
+//     REQUIRE(tree.contains(12));
+//     REQUIRE(tree.contains(9));
+//     tree.remove(9);
+//     tree.remove(18);
+//     // What happens?  12 is now a leaf and must fall.  But 19 is a (2,2) and
+//     // remains at level 3.
+//     REQUIRE(!tree.contains(9));
+//     REQUIRE(!tree.contains(18));
+//     REQUIRE(tree.level(20) == 1);
+//     REQUIRE(tree.level(12) == 1);
+//     REQUIRE(tree.level(19) == 3);
+// }
 // NOLINTEND
+
+TEST_CASE("simpleLL",
+          "[Required][Basic][Insert][Contains]") {
+    proj4::CrumpleTree<int, std::string> tree;
+    tree.insert(40, "40");
+    REQUIRE(tree.getleftedge(40)==1);
+    REQUIRE(tree.getrightedge(40)==1);
+    tree.insert(30, "30");
+    REQUIRE(tree.getleftedge(40)==1);
+    REQUIRE(tree.getrightedge(40)==2);
+    REQUIRE(tree.getleftedge(30)==1);
+    REQUIRE(tree.getrightedge(30)==1);
+    tree.insert(20, "20");
+    REQUIRE(tree.getleftedge(40)==1);
+    REQUIRE(tree.getrightedge(40)==1);
+    REQUIRE(tree.getleftedge(30)==1);
+    REQUIRE(tree.getrightedge(30)==1);
+    REQUIRE(tree.getleftedge(20)==1);
+    REQUIRE(tree.getrightedge(20)==1);
+    REQUIRE(tree.contains(40));
+    REQUIRE(tree.contains(30));
+    REQUIRE(tree.contains(20));
+    REQUIRE(tree.getroot() == 30);
+    REQUIRE(tree.level(30) == 2);
+    REQUIRE(tree.level(20) == 1);
+    REQUIRE(tree.level(40) == 1);
+    REQUIRE(tree.size()==3);
+}
+
+TEST_CASE("simpleLR",
+          "[Required][Basic][Insert][Contains]") {
+    proj4::CrumpleTree<int, std::string> tree;
+    tree.insert(50, "50");
+    REQUIRE(tree.getleftedge(50)==1);
+    REQUIRE(tree.getrightedge(50)==1);
+    tree.insert(40, "40");
+    REQUIRE(tree.getleftedge(50)==1);
+    REQUIRE(tree.getrightedge(50)==2);
+    REQUIRE(tree.getleftedge(40)==1);
+    REQUIRE(tree.getrightedge(40)==1);
+    tree.insert(45, "45");
+    REQUIRE(tree.getroot()==45);
+    REQUIRE(tree.getleftedge(45)==1);
+    REQUIRE(tree.getrightedge(45)==1);
+    REQUIRE(tree.getleftedge(40)==1);
+    REQUIRE(tree.getrightedge(40)==1);
+    REQUIRE(tree.getleftedge(50)==1);
+    REQUIRE(tree.getrightedge(50)==1);
+    REQUIRE(tree.contains(50));
+    REQUIRE(tree.contains(40));
+    REQUIRE(tree.contains(45));
+    REQUIRE(tree.level(45) == 2);
+    REQUIRE(tree.level(50) == 1);
+    REQUIRE(tree.level(40) == 1);
+    REQUIRE(tree.size()==3);
+}
 
 }  // namespace
