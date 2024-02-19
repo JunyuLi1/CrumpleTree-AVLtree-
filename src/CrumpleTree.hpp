@@ -33,6 +33,7 @@ class CrumpleTree {
     Node * root;
     Node * inserthelper(Node*node,const K &key,const V &value)//
     {
+        bool exceute = false;
         if(node==nullptr)
         {
             node = new Node(key,value);
@@ -45,17 +46,30 @@ class CrumpleTree {
         else {
             node->rightChildren=inserthelper(node->rightChildren,key,value);
         }
+        if(node->leftChildren!=nullptr&&node->leftChildren->node_level!=node->node_level && 
+           (node->node_level - node->leftedge)!=node->leftChildren->node_level){
+            node->leftedge--;
+            return node;
+        }
+        if(node->rightChildren!=nullptr&&node->rightChildren->node_level!=node->node_level && 
+           (node->node_level - node->rightedge)!=node->rightChildren->node_level){
+            node->rightedge--;
+            return node;
+        }
         if(node->leftChildren!=nullptr&&node->leftChildren->node_level==node->node_level)
         {
             node->rightedge++;
+            exceute=true;
         }
         if(node->rightChildren!=nullptr&&node->rightChildren->node_level==node->node_level)
         {
             node->leftedge++;
+            exceute=true;
         }
         //rebalanced
         if(node->rightedge>2) //left rising;
         {
+            exceute=true;
             node->rightedge--;
             Node * newroot = node->leftChildren;
             if (node->leftChildren->rightedge==2) { //case3 left rising
@@ -98,6 +112,7 @@ class CrumpleTree {
             }
         }
         if(node->leftedge>2) {
+            exceute=true;
             node->leftedge--;
             Node * newroot = node->rightChildren;
             if(node->rightChildren->leftedge==2){ //case 3 right rising
@@ -136,6 +151,10 @@ class CrumpleTree {
                     node=newroot;
                 }
             }
+        }
+        if(!exceute)
+        {
+            return node;
         }
         node->node_level++;
         return node;
