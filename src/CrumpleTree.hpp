@@ -286,16 +286,42 @@ unsigned CrumpleTree<K, V>::level(const K &key) const {
 
 template <typename K, typename V>
 V &CrumpleTree<K, V>::find(const K &key) {
-    // TODO: Implement this
-    V tmp;
-    return tmp;
+    Node * tempNode = root;
+    while(tempNode!=nullptr)
+    {
+        if(key==tempNode->key)
+        {
+            return tempNode->Value;
+        }
+        if(key<tempNode->key)
+        {
+            tempNode=tempNode->leftChildren;
+        }
+        else {
+            tempNode=tempNode->rightChildren;
+        }
+    }
+    throw ElementNotFoundException("No such key");
 }
 
 template <typename K, typename V>
 const V &CrumpleTree<K, V>::find(const K &key) const {
-    // TODO: Implement this
-    V tmp;
-    return tmp;
+    Node * tempNode = root;
+    while(tempNode!=nullptr)
+    {
+        if(key==tempNode->key)
+        {
+            return tempNode->Value;
+        }
+        if(key<tempNode->key)
+        {
+            tempNode=tempNode->leftChildren;
+        }
+        else {
+            tempNode=tempNode->rightChildren;
+        }
+    }
+    throw ElementNotFoundException("No such key");
 }
 
 template <typename K, typename V>

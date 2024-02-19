@@ -410,4 +410,13 @@ TEST_CASE("Case1left",
     REQUIRE(tree.level(30)==1);
 }
 
+TEST_CASE("find test",
+          "[Required][Basic][Insert][Contains]") {
+    
+    proj4::CrumpleTree<int, int> tree;
+    const proj4::CrumpleTree<int, int> & treeRef= tree;
+    tree.insert(1, 2);
+    REQUIRE(treeRef.find(1)==2);
+}
+
 }  // namespace
