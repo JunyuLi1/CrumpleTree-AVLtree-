@@ -394,6 +394,15 @@ class CrumpleTree {
            resultvector.push_back(node->key);
         }
     }
+    void destructhelper(Node * node)
+    {
+        if(node!=nullptr)
+        {
+            destructhelper(node->leftChildren);
+            destructhelper(node->rightChildren);
+            delete node;
+        }
+    }
    public:
     CrumpleTree();
 
@@ -463,7 +472,8 @@ CrumpleTree<K, V>::CrumpleTree() {
 
 template <typename K, typename V>
 CrumpleTree<K, V>::~CrumpleTree() {
-    //todo
+    Node * currentNode=root;
+    destructhelper(currentNode);
 }
 
 template <typename K, typename V>

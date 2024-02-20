@@ -320,4 +320,51 @@ TEST_CASE("remove_condition_4B_l",
     REQUIRE(tree.size() == 3);
 }
 
+TEST_CASE("simple6left",
+          "[Required][Insert][Erase][Contains][Level]") {
+    proj4::CrumpleTree<int, std::string> tree;
+    tree.insert(20, "20");
+    tree.insert(50, "50");
+    tree.insert(10, "10");
+    tree.insert(1, "1");
+    tree.insert(5, "5");
+    tree.insert(9, "45");
+    tree.insert(25, "25");
+    tree.insert(23, "23");
+    tree.remove(23);
+    tree.remove(1);
+    tree.remove(9);
+    tree.remove(5);
+    REQUIRE(tree.level(25)==3);
+    REQUIRE(tree.level(10)==2);
+    REQUIRE(tree.level(20)==1);
+    REQUIRE(tree.level(50)==1);
+    REQUIRE(tree.size() == 4);
+}
+
+TEST_CASE("condition6left",
+          "[Required][Basic][Insert][Contains]") {
+    
+    proj4::CrumpleTree<int, int> tree;
+    tree.insert(19, 19);
+    tree.insert(18, 18);
+    tree.insert(40, 40);
+    tree.insert(30, 30);
+    tree.insert(41, 41);
+    tree.insert(29, 29);
+    tree.insert(31, 31);
+    tree.remove(18);
+    tree.remove(29);
+    tree.insert(32, 32);
+    tree.insert(42, 42);
+    tree.remove(42);
+    tree.remove(19);
+    REQUIRE(tree.size()==5);
+    REQUIRE(tree.level(31)==3);
+    REQUIRE(tree.level(40)==2);
+    REQUIRE(tree.level(30)==1);
+    REQUIRE(tree.level(32)==1);
+    REQUIRE(tree.level(41)==1);
+}
+
 }  // namespace
