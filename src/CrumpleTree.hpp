@@ -200,154 +200,162 @@ class CrumpleTree {
             node->node_level=1;
             node->rightedge=1;
             node->leftedge=1;
+        } // update edge
+        if (node->leftChildren!=nullptr){
+            node->leftedge = node->node_level - node->leftChildren->node_level;
+            if (node->rightChildren == nullptr){
+                node->rightedge = node->node_level - 0;
+            }
         }
-        else if (node->leftedge==1 && node->leftChildren!=nullptr && node->node_level-2==node->leftChildren->node_level) { //case 1A left
-            node->leftedge++;
-        }
-        else if (node->rightedge==1 && node->rightChildren!=nullptr && node->node_level-2==node->rightChildren->node_level) { //case 1A right
-            node->rightedge++;
-        }
-        else if (node->leftedge==2 && node->leftChildren==nullptr && node->rightChildren->node_level!=1) { //4bleft
-            Node * newroot = node->rightChildren;
-            node->rightChildren = nullptr;
-            node->leftedge=1;
-            node->rightedge=1;
-            node->node_level=1;
-            newroot->leftChildren=node;
-            newroot->leftedge--;
-            node = newroot;
-        }
-        else if(node->rightedge==2 && node->rightChildren == nullptr && node->leftChildren->node_level!=1) //4b right
+        if(node->rightChildren!=nullptr)
         {
-            Node * newroot = node->rightChildren;
-            node->leftChildren=nullptr;
-            node->rightedge=1;
-            node->leftedge=1;
-            node->node_level=1;
-            newroot->rightChildren=node;
-            newroot->rightedge--;
-            node=newroot;
+            node->rightedge = node->node_level - node->rightChildren->node_level;
+            if(node->leftChildren == nullptr)
+            {
+                node->leftedge = node->node_level - 0;
+            }
         }
-        else if (node->leftedge==2 && node->leftChildren==nullptr && node->rightChildren->node_level==1) { //4bleft but level=1
-            node->node_level--;
-            node->rightedge--;
-        }
-        else if(node->rightedge==2 && node->rightChildren == nullptr && node->leftChildren->node_level==1) //4b left but level=1
+        if((node->leftedge==3 && node->rightedge ==2) || (node->rightedge==3 && node->leftedge==2)) //case 2 left and right
         {
             node->node_level--;
             node->leftedge--;
+            node->rightedge--;
         }
-        else if(node->leftedge==2 && (node->node_level-node->leftChildren->node_level)!=node->leftedge) { //left falling 2,3,4a,5,6
+        else if(node->leftedge==3 && node->rightedge==1 && node->rightChildren->leftedge ==1 && node->rightChildren->rightedge ==1)//case3 left
+        {
             Node * newroot = node->rightChildren;
-            if(node->rightedge==2) //case2 left
-            {
-                node->rightedge--;
-                node->node_level--;
-            }
-            if(node->rightChildren->leftedge==1 && node->rightChildren->rightedge==1) //case 3 left
-            {
-                Node * temp_right = newroot->leftChildren;
-                node->node_level--;
-                node->rightChildren=temp_right;
-                newroot->leftChildren=node;
-                newroot->node_level++;
-                newroot->rightedge++;
-                node=newroot;
-            }
-            if(node->rightChildren->leftedge==2 && node->rightChildren->rightedge==1) //case 4a left
-            {
-                Node * temp_right = newroot->leftChildren;
-                node->rightChildren = temp_right;
-                node->node_level--;
-                node->rightedge++;
-                newroot->leftChildren=node;
-                newroot->rightedge++;
-                newroot->leftedge--;
-                newroot->node_level++;
-                node = newroot;
-            }
-            if(node->rightChildren->leftedge==1 && node->rightChildren->rightedge==2) //case 5 left
-            {
-                Node * right_child = node->rightChildren;
-                newroot = newroot->leftChildren;
-                node->leftedge--;
-                node->node_level-=2;
-                node->rightChildren = newroot->leftChildren;
-                node->rightedge = newroot->leftedge;
-                right_child->rightedge--;
-                right_child->node_level--;
-                right_child->leftedge=newroot->rightedge;
-                right_child->leftChildren=newroot->rightChildren;
-                newroot->leftChildren=node;
-                newroot->rightChildren=right_child;
-                newroot->leftedge=2;
-                newroot->rightedge=2;
-                newroot->node_level+=2;
-                node = newroot;
-            }
-            if(node->rightChildren->leftedge==2 && node->rightChildren->rightedge==2) //case 6 left
-            {
-                node->node_level--;
-                node->rightChildren->node_level--;
-                node->rightChildren->leftedge--;
-                node->rightChildren->rightedge--;
-            }
+            node->leftedge =2;
+            node->rightedge =1;
+            node->node_level--;
+            node->rightChildren = newroot->leftChildren;
+            newroot->leftedge=1;
+            newroot->rightedge=2;
+            newroot->node_level++;
+            newroot->leftChildren = node;
+            node = newroot;
         }
-        else if(node->rightedge==2 && (node->node_level-node->rightChildren->node_level)!=node->rightedge){ //right falling
+        else if (node->rightedge==3 && node->leftedge ==1 && node->leftChildren->leftedge ==1 && node->leftChildren->rightedge ==1) { //case3 right
             Node * newroot = node->leftChildren;
-            if(node->leftedge==2) //case 2 right
-            {
-                node->node_level--;
-                node->leftedge--;
-            }
-            if(node->leftChildren->leftedge==1 && node->leftChildren->rightedge==1) //case 3 right
-            {
-                Node * temp_left = newroot->rightChildren;
-                node->leftChildren=temp_left;
-                node->node_level--;
-                newroot->rightChildren=node;
-                newroot->leftedge++;
-                newroot->node_level++;
-                node = newroot;
-            }
-            if(node->leftChildren->leftedge==1 && node->leftChildren->rightedge==2) //4a right
-            {
-                Node * temp_left = newroot->rightChildren;
-                node->leftChildren=temp_left;
-                node->leftedge++;
-                node->node_level--;
-                newroot->rightChildren=node;
-                newroot->rightedge--;
-                newroot->leftedge++;
-                newroot->node_level++;
-                node = newroot;
-            }
-            if(node->leftChildren->leftedge==2 && node->leftChildren->rightedge==1) //5 right
-            {
-                Node * leftchild = node->leftChildren;
-                newroot = newroot->rightChildren;
-                node->leftChildren=newroot->rightChildren;
-                node->leftedge=newroot->rightedge;
-                node->rightedge=1;
-                node->node_level-=2;
-                leftchild->leftedge--;
-                leftchild->rightChildren=newroot->leftChildren;
-                leftchild->rightedge=newroot->leftedge;
-                leftchild->node_level--;
-                newroot->leftChildren=leftchild;
-                newroot->rightChildren=node;
-                newroot->leftedge=2;
-                newroot->rightedge=2;
-                newroot->node_level+=2;
-                node=newroot;
-            }
-            if(node->leftChildren->leftedge==2 && node->leftChildren->rightedge==2) //6 right
-            {
-                node->leftChildren->node_level--;
-                node->leftChildren->leftedge=1;
-                node->leftChildren->rightedge=1;
-                node->node_level--;
-            }
+            node->rightedge=2;
+            node->leftedge=1;
+            node->node_level--;
+            node->leftChildren = newroot->rightChildren;
+            newroot->leftedge=2;
+            newroot->rightedge=1;
+            newroot->node_level++;
+            newroot->rightChildren = node;
+            node = newroot;
+        }
+        else if (node->leftedge==3 && node->rightedge==1 && node->leftChildren!=nullptr && node->rightChildren->leftedge==2
+                 && node->rightChildren->rightedge==1) { //4a left
+            Node * newroot = node->rightChildren;
+            node->leftedge=2;
+            node->rightedge=2;
+            node->node_level--;
+            node->rightChildren = newroot->leftChildren;
+            newroot->node_level++;
+            newroot->leftedge =1;
+            newroot->rightedge =2;
+            newroot->leftChildren = node;
+            node = newroot;
+        }
+        else if(node->rightedge==3 && node->leftedge==1 && node->rightChildren!=nullptr && node->leftChildren->rightedge==2
+                && node->leftChildren->leftedge==1) //4a right
+        {
+            Node * newroot = node->leftChildren;
+            node->rightedge=2;
+            node->leftedge=2;
+            node->node_level--;
+            node->leftChildren = newroot->rightChildren;
+            newroot->leftedge=2;
+            newroot->rightedge=1;
+            newroot->node_level++;
+            newroot->rightChildren = node;
+            node = newroot;
+        }
+        else if(node->leftedge==3 && node->rightedge==1 && node->leftChildren==nullptr && node->rightChildren->leftedge ==2
+                && node->rightChildren->rightedge==1) //4b left
+        {
+            Node * newroot = node->rightChildren;
+            node->node_level-=2;
+            node->leftedge=1;
+            node->rightedge=1;
+            node->leftChildren = nullptr;
+            node->rightChildren=nullptr;
+            newroot->leftChildren=node;
+            newroot->leftedge =1;
+            newroot->rightedge=1;
+            node = newroot;
+        }
+        else if(node->rightedge==3 && node->leftedge==1 && node->rightChildren==nullptr && node->leftChildren->leftedge ==1
+                && node->leftChildren->rightedge==2) //4b left
+        {
+            Node * newroot = node->leftChildren;
+            node->node_level-=2;
+            node->leftedge=1;
+            node->rightedge=1;
+            node->leftChildren = nullptr;
+            node->rightChildren=nullptr;
+            newroot->rightChildren=node;
+            newroot->leftedge =1;
+            newroot->rightedge=1;
+            node = newroot;
+        }
+        else if(node->leftedge ==3 && node->rightedge ==1 && node->rightChildren->leftedge==1 && node->rightChildren->rightedge ==2) //case 5 left
+        {
+            Node * rightchild = node->rightChildren;
+            Node * newroot = rightchild->leftChildren;
+            node->leftedge=1;
+            node->rightedge = newroot->leftedge;
+            node->node_level-=2;
+            node->rightChildren = newroot->leftChildren;
+            rightchild->leftedge = newroot->rightedge;
+            rightchild->rightedge = 1;
+            rightchild->node_level--;
+            rightchild->leftChildren = newroot->rightChildren;
+            newroot->leftChildren=node;
+            newroot->rightChildren = rightchild;
+            newroot->leftedge=2;
+            newroot->rightedge=2;
+            newroot->node_level+=2;
+            node = newroot;
+        }
+        else if(node->rightedge ==3 && node->leftedge ==1 && node->leftChildren->leftedge==2 && node->leftChildren->rightedge ==1) //case 5right
+        {
+            Node * leftchild = node->leftChildren;
+            Node * newroot = leftchild->rightChildren;
+            node->leftedge=newroot->rightedge;
+            node->rightedge = 1;
+            node->node_level-=2;
+            node->leftChildren = newroot->rightChildren;
+            leftchild->leftedge = 1;
+            leftchild->rightedge = newroot->leftedge;
+            leftchild->node_level--;
+            leftchild->rightChildren = newroot->leftChildren;
+            newroot->leftChildren=leftchild;
+            newroot->rightChildren = node;
+            newroot->leftedge=2;
+            newroot->rightedge=2;
+            newroot->node_level+=2;
+            node = newroot;
+        }
+        else if(node->leftedge==3 && node->rightedge==1 && node->rightChildren->leftedge==2 && node->rightChildren->rightedge==2)//case 6 left
+        {
+            node->leftedge=2;
+            node->rightedge=1;
+            node->node_level--;
+            node->rightChildren->node_level--;
+            node->rightChildren->leftedge=1;
+            node->rightChildren->rightedge=1;
+        }
+        else if(node->rightedge==3 && node->leftedge==1 && node->leftChildren->leftedge==2 && node->leftChildren->rightedge==2)//case 6 right
+        {
+            node->leftedge=1;
+            node->rightedge=2;
+            node->node_level--;
+            node->leftChildren->node_level--;
+            node->leftChildren->leftedge=1;
+            node->leftChildren->rightedge=1;
         }
         return node;
     }
