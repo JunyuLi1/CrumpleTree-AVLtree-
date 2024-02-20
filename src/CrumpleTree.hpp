@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace shindler::ics46::project4 {
@@ -159,6 +160,205 @@ class CrumpleTree {
         node->node_level++;
         return node;
     }
+    Node * removehelper(Node*node, const K &key)
+    {
+        if(node->key == key) //如果succesor是leaf 结束，不是继续替换
+        {
+            if(node->rightChildren==nullptr && node->leftChildren==nullptr)
+            {
+                delete node;
+                return nullptr;
+            }
+            if (node->rightChildren!=nullptr) { //inorder successor
+                Node * inorderSuccessor = findsuccessor(node->rightChildren);
+                std::swap(node->key,inorderSuccessor->key);
+                std::swap(node->Value,inorderSuccessor->Value);
+                while(inorderSuccessor->node_level!=1)
+                {
+                    Node * temp_node=inorderSuccessor;
+                    inorderSuccessor=findsuccessor(inorderSuccessor->rightChildren);
+                    std::swap(temp_node->key,inorderSuccessor->key);
+                    std::swap(temp_node->Value,inorderSuccessor->Value);
+                }
+                node->rightChildren = removehelper(node->rightChildren, key); //start recursion
+            }
+            else { //inorder predecessor
+                std::swap(node->key,node->leftChildren->key);
+                std::swap(node->Value,node->leftChildren->Value);
+                node-> leftChildren = removehelper(node->leftChildren, key);
+            }
+        }
+        else if(key<node->key && node->leftChildren!=nullptr)
+        {
+            node->leftChildren=removehelper(node->leftChildren,key);
+        }
+        else{
+            node->rightChildren=removehelper(node->rightChildren,key);
+        }
+        if(node->rightChildren==nullptr&&node->leftChildren==nullptr&&node->node_level!=1) //case 1B all
+        {
+            node->node_level=1;
+            node->rightedge=1;
+            node->leftedge=1;
+        }
+        else if (node->leftedge==1 && node->leftChildren!=nullptr && node->node_level-2==node->leftChildren->node_level) { //case 1A left
+            node->leftedge++;
+        }
+        else if (node->rightedge==1 && node->rightChildren!=nullptr && node->node_level-2==node->rightChildren->node_level) { //case 1A right
+            node->rightedge++;
+        }
+        else if (node->leftedge==2 && node->leftChildren==nullptr && node->rightChildren->node_level!=1) { //4bleft
+            Node * newroot = node->rightChildren;
+            node->rightChildren = nullptr;
+            node->leftedge=1;
+            node->rightedge=1;
+            node->node_level=1;
+            newroot->leftChildren=node;
+            newroot->leftedge--;
+            node = newroot;
+        }
+        else if(node->rightedge==2 && node->rightChildren == nullptr && node->leftChildren->node_level!=1) //4b right
+        {
+            Node * newroot = node->rightChildren;
+            node->leftChildren=nullptr;
+            node->rightedge=1;
+            node->leftedge=1;
+            node->node_level=1;
+            newroot->rightChildren=node;
+            newroot->rightedge--;
+            node=newroot;
+        }
+        else if (node->leftedge==2 && node->leftChildren==nullptr && node->rightChildren->node_level==1) { //4bleft but level=1
+            node->node_level--;
+            node->rightedge--;
+        }
+        else if(node->rightedge==2 && node->rightChildren == nullptr && node->leftChildren->node_level==1) //4b left but level=1
+        {
+            node->node_level--;
+            node->leftedge--;
+        }
+        else if(node->leftedge==2 && (node->node_level-node->leftChildren->node_level)!=node->leftedge) { //left falling 2,3,4a,5,6
+            Node * newroot = node->rightChildren;
+            if(node->rightedge==2) //case2 left
+            {
+                node->rightedge--;
+                node->node_level--;
+            }
+            if(node->rightChildren->leftedge==1 && node->rightChildren->rightedge==1) //case 3 left
+            {
+                Node * temp_right = newroot->leftChildren;
+                node->node_level--;
+                node->rightChildren=temp_right;
+                newroot->leftChildren=node;
+                newroot->node_level++;
+                newroot->rightedge++;
+                node=newroot;
+            }
+            if(node->rightChildren->leftedge==2 && node->rightChildren->rightedge==1) //case 4a left
+            {
+                Node * temp_right = newroot->leftChildren;
+                node->rightChildren = temp_right;
+                node->node_level--;
+                node->rightedge++;
+                newroot->leftChildren=node;
+                newroot->rightedge++;
+                newroot->leftedge--;
+                newroot->node_level++;
+                node = newroot;
+            }
+            if(node->rightChildren->leftedge==1 && node->rightChildren->rightedge==2) //case 5 left
+            {
+                Node * right_child = node->rightChildren;
+                newroot = newroot->leftChildren;
+                node->leftedge--;
+                node->node_level-=2;
+                node->rightChildren = newroot->leftChildren;
+                node->rightedge = newroot->leftedge;
+                right_child->rightedge--;
+                right_child->node_level--;
+                right_child->leftedge=newroot->rightedge;
+                right_child->leftChildren=newroot->rightChildren;
+                newroot->leftChildren=node;
+                newroot->rightChildren=right_child;
+                newroot->leftedge=2;
+                newroot->rightedge=2;
+                newroot->node_level+=2;
+                node = newroot;
+            }
+            if(node->rightChildren->leftedge==2 && node->rightChildren->rightedge==2) //case 6 left
+            {
+                node->node_level--;
+                node->rightChildren->node_level--;
+                node->rightChildren->leftedge--;
+                node->rightChildren->rightedge--;
+            }
+        }
+        else if(node->rightedge==2 && (node->node_level-node->rightChildren->node_level)!=node->rightedge){ //right falling
+            Node * newroot = node->leftChildren;
+            if(node->leftedge==2) //case 2 right
+            {
+                node->node_level--;
+                node->leftedge--;
+            }
+            if(node->leftChildren->leftedge==1 && node->leftChildren->rightedge==1) //case 3 right
+            {
+                Node * temp_left = newroot->rightChildren;
+                node->leftChildren=temp_left;
+                node->node_level--;
+                newroot->rightChildren=node;
+                newroot->leftedge++;
+                newroot->node_level++;
+                node = newroot;
+            }
+            if(node->leftChildren->leftedge==1 && node->leftChildren->rightedge==2) //4a right
+            {
+                Node * temp_left = newroot->rightChildren;
+                node->leftChildren=temp_left;
+                node->leftedge++;
+                node->node_level--;
+                newroot->rightChildren=node;
+                newroot->rightedge--;
+                newroot->leftedge++;
+                newroot->node_level++;
+                node = newroot;
+            }
+            if(node->leftChildren->leftedge==2 && node->leftChildren->rightedge==1) //5 right
+            {
+                Node * leftchild = node->leftChildren;
+                newroot = newroot->rightChildren;
+                node->leftChildren=newroot->rightChildren;
+                node->leftedge=newroot->rightedge;
+                node->rightedge=1;
+                node->node_level-=2;
+                leftchild->leftedge--;
+                leftchild->rightChildren=newroot->leftChildren;
+                leftchild->rightedge=newroot->leftedge;
+                leftchild->node_level--;
+                newroot->leftChildren=leftchild;
+                newroot->rightChildren=node;
+                newroot->leftedge=2;
+                newroot->rightedge=2;
+                newroot->node_level+=2;
+                node=newroot;
+            }
+            if(node->leftChildren->leftedge==2 && node->leftChildren->rightedge==2) //6 right
+            {
+                node->leftChildren->node_level--;
+                node->leftChildren->leftedge=1;
+                node->leftChildren->rightedge=1;
+                node->node_level--;
+            }
+        }
+        return node;
+    }
+    Node * findsuccessor(Node*node)
+    {
+        if(node->leftChildren==nullptr)
+        {
+            return node;
+        }
+        return findsuccessor(node->leftChildren);
+    }
    public:
     CrumpleTree();
 
@@ -218,9 +418,6 @@ class CrumpleTree {
     [[nodiscard]] std::vector<K> preOrder() const;
     [[nodiscard]] std::vector<K> postOrder() const;
 
-    unsigned getrightedge(const K&key);
-    unsigned getleftedge(const K&key);
-    K&getroot();
 };
 
 template <typename K, typename V>
@@ -231,7 +428,7 @@ CrumpleTree<K, V>::CrumpleTree() {
 
 template <typename K, typename V>
 CrumpleTree<K, V>::~CrumpleTree() {
-    // TODO: Implement this
+    //todo
 }
 
 template <typename K, typename V>
@@ -339,7 +536,13 @@ void CrumpleTree<K, V>::insert(const K &key, const V &value) {
 
 template <typename K, typename V>
 void CrumpleTree<K, V>::remove(const K &key) {
-    // TODO: Implement this
+    if(!contains(key))
+    {
+        return;
+    }
+    Node*currentNode = root;
+    root = removehelper(currentNode,key);
+    num_keys--;
 }
 
 template <typename K, typename V>
@@ -358,50 +561,6 @@ template <typename K, typename V>
 std::vector<K> CrumpleTree<K, V>::postOrder() const {
     // TODO: Implement this
     return {};
-}
-template <typename K, typename V>
-unsigned CrumpleTree<K, V>::getrightedge(const K&key)
-{
-    Node * tempNode = root;
-    while(tempNode!=nullptr)
-    {
-        if(key==tempNode->key)
-        {
-            return tempNode->rightedge;
-        }
-        if(key<tempNode->key)
-        {
-            tempNode=tempNode->leftChildren;
-        }
-        else {
-            tempNode=tempNode->rightChildren;
-        }
-    }
-}
-
-template <typename K, typename V>
-unsigned CrumpleTree<K, V>::getleftedge(const K&key)
-{
-    Node * tempNode = root;
-    while(tempNode!=nullptr)
-    {
-        if(key==tempNode->key)
-        {
-            return tempNode->leftedge;
-        }
-        if(key<tempNode->key)
-        {
-            tempNode=tempNode->leftChildren;
-        }
-        else {
-            tempNode=tempNode->rightChildren;
-        }
-    }
-}
-
-template <typename K, typename V>
-K &CrumpleTree<K, V>::getroot() {
-    return root->key;
 }
 
 }  // namespace shindler::ics46::project4
