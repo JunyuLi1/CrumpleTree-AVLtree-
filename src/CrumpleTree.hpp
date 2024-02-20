@@ -367,6 +367,33 @@ class CrumpleTree {
         }
         return findsuccessor(node->leftChildren);
     }
+    void inorderhelper(Node * node, std::vector<K>&resultvector) const
+    {
+        if(node!=nullptr)
+        {
+            inorderhelper(node->leftChildren, resultvector);
+            resultvector.push_back(node->key);
+            inorderhelper(node->rightChildren, resultvector);
+        }
+    }
+    void preorderhelper(Node * node, std::vector<K>&resultvector) const
+    {
+        if(node!=nullptr)
+        {
+            resultvector.push_back(node->key);
+            preorderhelper(node->leftChildren, resultvector);
+            preorderhelper(node->rightChildren, resultvector);
+        }
+    }
+    void postorderhelper(Node * node, std::vector<K>&resultvector) const
+    {
+        if(node!=nullptr)
+        {
+           postorderhelper(node->leftChildren, resultvector);
+           postorderhelper(node->rightChildren, resultvector);
+           resultvector.push_back(node->key);
+        }
+    }
    public:
     CrumpleTree();
 
@@ -555,20 +582,26 @@ void CrumpleTree<K, V>::remove(const K &key) {
 
 template <typename K, typename V>
 std::vector<K> CrumpleTree<K, V>::inOrder() const {
-    // TODO: Implement this
-    return {};
+    Node * currentNode = root;
+    std::vector<K> inorderkeys;
+    inorderhelper(currentNode, inorderkeys);
+    return inorderkeys;
 }
 
 template <typename K, typename V>
 std::vector<K> CrumpleTree<K, V>::preOrder() const {
-    // TODO: Implement this
-    return {};
+    Node * currentNode = root;
+    std::vector<K> preorderkeys;
+    preorderhelper(currentNode, preorderkeys);
+    return preorderkeys;
 }
 
 template <typename K, typename V>
 std::vector<K> CrumpleTree<K, V>::postOrder() const {
-    // TODO: Implement this
-    return {};
+    Node * currentNode = root;
+    std::vector<K> postorderkeys;
+    postorderhelper(currentNode, postorderkeys);
+    return postorderkeys;
 }
 
 }  // namespace shindler::ics46::project4

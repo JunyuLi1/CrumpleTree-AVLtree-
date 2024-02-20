@@ -53,16 +53,32 @@ TEST_CASE("Tree:5Inserts:ExpectSize5", "[Required][Basic][Insert][Size]") {
     REQUIRE(tree.size() == 5);
 }
 
-// TEST_CASE("Tree:DoAPostOrder:ExpectCorrectPostorderTraversal",
-//           "[Required][Basic][Insert][PostOrder]") {
-//     proj4::CrumpleTree<int, std::string> tree;
-//     tree.insert(5, "foo");
-//     tree.insert(3, "sna");
-//     tree.insert(10, "bar");
-//     auto trav = tree.postOrder();
-//     static const std::vector<int> expected = {3, 10, 5};
-//     REQUIRE(trav == expected);
-// }
+TEST_CASE("Tree:DoAPostOrder:ExpectCorrectPostorderTraversal",
+          "[Required][Basic][Insert][PostOrder]") {
+    proj4::CrumpleTree<int, std::string> tree;
+    tree.insert(5, "foo");
+    tree.insert(3, "sna");
+    tree.insert(10, "bar");
+    auto trav = tree.postOrder();
+    static const std::vector<int> expected = {3, 10, 5};
+    REQUIRE(trav == expected);
+}
+
+TEST_CASE("Tree:inorder",
+          "[Required][Basic][Insert][PostOrder]") {
+    proj4::CrumpleTree<int, std::string> tree;
+    tree.insert(40, "foo");
+    tree.insert(20, "sna");
+    tree.insert(60, "bar");
+    tree.insert(3, "bar");
+    tree.insert(25, "bar");
+    tree.insert(15, "bar");
+    tree.insert(1, "bar");
+    tree.insert(44, "bar");
+    auto trav = tree.inOrder();
+    static const std::vector<int> expected = {1,3,15,20,25,40,44,60};
+    REQUIRE(trav == expected);
+}
 
 TEST_CASE("Tree:RemoveDoesARemove:ExpectElementsNotInTreeAndLevelsCorrect",
           "[Required][Insert][Erase][Contains][Level]") {
